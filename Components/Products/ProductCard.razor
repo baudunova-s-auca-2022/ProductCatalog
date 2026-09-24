@@ -15,8 +15,8 @@
             <span class="product-price">
                 $@Product.Price.ToString("0.00")
             </span>
-            <button class="add-button" @onclick="OnAddToCart">
-                Add
+            <button class="add-button" @onclick="AddToCart">
+                @(isAdded ? "Added ✓" : "Add")
             </button>
         </div>
     </div>
@@ -28,4 +28,14 @@
 
     [Parameter]
     public EventCallback OnAddToCart { get; set; }
+
+    private bool isAdded = false;
+
+    private async Task AddToCart()
+    {
+        await OnAddToCart.InvokeAsync();
+        isAdded = true;
+        await Task.Delay(1000);
+        isAdded = false;
+    }
 }
