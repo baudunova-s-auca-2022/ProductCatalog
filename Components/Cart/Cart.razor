@@ -2,9 +2,7 @@
     <div class="cart-header">
         <div>
             <h2>Shopping cart</h2>
-            <span>
-                @Products.Sum(item => item.Quantity) items
-            </span>
+            <span>@Products.Sum(item => item.Quantity) items</span>
         </div>
         <button class="close-button" @onclick="OnClose">
             ×
@@ -24,35 +22,36 @@
             @foreach (var item in Products)
             {
                 <div class="cart-item">
-                    <div class="cart-info">
-                        <div class="product-name">
-                            @item.Product.Name
+                    <div class="product-row">
+                        <div>
+                            <div class="product-name">
+                                @item.Product.Name
+                            </div>
+                            <span class="product-category">
+                                @item.Product.Category
+                            </span>
                         </div>
-                        <span>
-                            @item.Product.Category
-                        </span>
                         <div class="product-price">
                             $@item.Product.Price.ToString("0.00")
                         </div>
+                    </div>
+                    <div class="item-actions">
                         <div class="quantity">
                             <button @onclick="() => Decrease(item)">
                                 −
                             </button>
-
                             <span>@item.Quantity</span>
-
                             <button @onclick="() => Increase(item)">
                                 +
                             </button>
                         </div>
+                        <button class="remove-button" @onclick="() => Remove(item)">
+                            Remove
+                        </button>
                     </div>
-                    <button class="remove-button" @onclick="() => Remove(item)">
-                        ×
-                    </button>
                 </div>
             }
         </div>
-
         <div class="cart-total">
             <span>Total</span>
             <div class="total-price">
