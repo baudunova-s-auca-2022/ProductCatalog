@@ -83,10 +83,10 @@
 }
 
 .product-price {
-    margin-top: 3px;
-    color: #b65336;
-    font-size: 13px;
-    font-weight: 600;
+  margin-top: 3px;
+  color: #b65336;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .remove-button {
@@ -120,8 +120,8 @@
 }
 
 .total-price {
-    font-size: 20px;
-    font-weight: 600;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .empty-cart {
@@ -139,6 +139,36 @@
   margin: 0;
   color: #968982;
   font-size: 12px;
+}
+
+.quantity {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.quantity button {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background-color: white;
+  color: #4b3830;
+  border: 1px solid #e4dad4;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.quantity button:hover {
+  color: #b65336;
+  border-color: #b65336;
+}
+
+.quantity span {
+  min-width: 20px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 @media (max-width: 600px) {

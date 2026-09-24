@@ -34,12 +34,17 @@
                         <div class="product-price">
                             $@item.Product.Price.ToString("0.00")
                         </div>
-                        @if (item.Quantity > 1)
-                        {
-                            <div class="product-quantity">
-                                ×@item.Quantity
-                            </div>
-                        }
+                        <div class="quantity">
+                            <button @onclick="() => Decrease(item)">
+                                −
+                            </button>
+
+                            <span>@item.Quantity</span>
+
+                            <button @onclick="() => Increase(item)">
+                                +
+                            </button>
+                        </div>
                     </div>
                     <button class="remove-button" @onclick="() => Remove(item)">
                         ×
@@ -70,5 +75,18 @@
     private async Task Remove(CartItem item)
     {
         await OnRemove.InvokeAsync(item);
+    }
+
+    private void Increase(CartItem item)
+    {
+        item.Quantity++;
+    }
+
+    private void Decrease(CartItem item)
+    {
+        if (item.Quantity > 1)
+        {
+            item.Quantity--;
+        }
     }
 }
