@@ -1,0 +1,31 @@
+<div class="product-card">
+    <div class="product-image">
+        <span>Product image</span>
+    </div>
+
+    <div class="product-info">
+        <span class="product-category">
+            @Product.Category
+        </span>
+        <h3>
+            @Product.Name
+        </h3>
+
+        <div class="product-bottom">
+            <span class="product-price">
+                $@Product.Price.ToString("0.00")
+            </span>
+            <button class="add-button" @onclick="OnAddToCart">
+                Add
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Product Product { get; set; } = new Product();
+
+    [Parameter]
+    public EventCallback OnAddToCart { get; set; }
+}

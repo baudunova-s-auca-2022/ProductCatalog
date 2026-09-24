@@ -1,0 +1,74 @@
+<div class="cart">
+    <div class="cart-header">
+        <div>
+            <h2>Shopping cart</h2>
+            <span>
+                @Products.Sum(item => item.Quantity) items
+            </span>
+        </div>
+        <button class="close-button" @onclick="OnClose">
+            ×
+        </button>
+    </div>
+
+    @if (Products.Count == 0)
+    {
+        <div class="empty-cart">
+            <h3>Your cart is empty</h3>
+            <p>Products you add will appear here.</p>
+        </div>
+    }
+    else
+    {
+        <div class="cart-products">
+            @foreach (var item in Products)
+            {
+                <div class="cart-item">
+                    <div class="cart-info">
+                        <div class="product-name">
+                            @item.Product.Name
+                        </div>
+                        <span>
+                            @item.Product.Category
+                        </span>
+                        <div class="product-price">
+                            $@item.Product.Price.ToString("0.00")
+                        </div>
+                        @if (item.Quantity > 1)
+                        {
+                            <div class="product-quantity">
+                                ×@item.Quantity
+                            </div>
+                        }
+                    </div>
+                    <button class="remove-button" @onclick="() => Remove(item)">
+                        ×
+                    </button>
+                </div>
+            }
+        </div>
+
+        <div class="cart-total">
+            <span>Total</span>
+            <div class="total-price">
+                $@Products.Sum(item => item.Product.Price * item.Quantity).ToString("0.00")
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<CartItem> Products { get; set; } = new List<CartItem>();
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    [Parameter]
+    public EventCallback<CartItem> OnRemove { get; set; }
+
+    private async Task Remove(CartItem item)
+    {
+        await OnRemove.InvokeAsync(item);
+    }
+}

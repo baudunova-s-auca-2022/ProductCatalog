@@ -1,0 +1,358 @@
+﻿@page "/"
+
+@rendermode InteractiveServer
+
+<PageTitle>HomeMarket</PageTitle>
+
+<div class="catalog">
+    <div class="top-bar">
+        <div class="search">
+            <input type="text" placeholder="Search for products..." @bind="searchInput" @bind:event="oninput"
+                   @bind:after="SearchProducts" />
+        </div>
+        <button class="search-button" @onclick="SearchProducts">
+            Search
+        </button>
+    </div>
+
+    <div class="categories">
+        <button class="@GetCategoryClass("All")" @onclick='() => SelectCategory("All")'>
+            All
+        </button>
+        <button class="@GetCategoryClass("Kitchen")" @onclick='() => SelectCategory("Kitchen")'>
+            Kitchen
+        </button>
+        <button class="@GetCategoryClass("Home")" @onclick='() => SelectCategory("Home")'>
+            Home
+        </button>
+        <button class="@GetCategoryClass("Decor")" @onclick='() => SelectCategory("Decor")'>
+            Decor
+        </button>
+        <button class="@GetCategoryClass("Organization")" @onclick='() => SelectCategory("Organization")'>
+            Organization
+        </button>
+    </div>
+
+    <div class="products-header">
+        <div>
+            <h1>Products</h1>
+            <p>@FilteredProductCount products</p>
+        </div>
+
+        <div class="products-actions">
+            <div class="sort">
+                <span>Sort:</span>
+                <select @bind="sortOrder">
+                    <option value="low">
+                        Price: low to high
+                    </option>
+                    <option value="high">
+                        Price: high to low
+                    </option>
+                </select>
+            </div>
+
+            <div class="cart-wrapper">
+                <button class="cart-button" @onclick="ToggleCart">
+                    <span>Cart</span>
+
+                    @if (cart.Count > 0)
+                    {
+                        <span class="cart-count">
+                            @cart.Sum(item => item.Quantity)
+                        </span>
+                    }
+                </button>
+
+                @if (showCart)
+                {
+                    <Cart Products="cart" OnClose="ToggleCart" OnRemove="RemoveFromCart" />
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (FilteredProductCount == 0)
+    {
+        <div class="empty-products">
+            <h3>No products found</h3>
+            <p>
+                Try another search or category.
+            </p>
+            <button @onclick="ClearFilters">
+                Clear filters
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="product-list">
+            @foreach (var product in GetProducts())
+            {
+                <ProductCard Product="product" OnAddToCart="() => AddToCart(product)" />
+            }
+        </div>
+
+        @if (TotalPages > 1)
+        {
+            <div class="pagination">
+                <button @onclick="PreviousPage" disabled="@(currentPage == 1)">
+                    Previous
+                </button>
+
+                @for (int page = 1; page <= TotalPages; page++)
+                {
+                    int pageNumber = page;
+                    <button class="@(currentPage == pageNumber ? "active" : "")" @onclick="() => GoToPage(pageNumber)">
+                        @pageNumber
+                    </button>
+                }
+
+                <button @onclick="NextPage" disabled="@(currentPage == TotalPages)">
+                    Next
+                </button>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private string searchInput = "";
+    private string searchText = "";
+    private string selectedCategory = "All";
+    private string sortOrder = "";
+    private bool showCart = false;
+    private int currentPage = 1;
+    private int productsPerPage = 8;
+    private List<Product> products = new List<Product>()
+    {
+        new Product
+        {
+            Name = "Ceramic Mug",
+            Price = 12.99m,
+            Category = "Kitchen"
+        },
+
+        new Product
+        {
+            Name = "Oil Dispenser",
+            Price = 18.50m,
+            Category = "Kitchen"
+        },
+
+        new Product
+        {
+            Name = "Cutting Board",
+            Price = 24.90m,
+            Category = "Kitchen"
+        },
+
+        new Product
+        {
+            Name = "Table Lamp",
+            Price = 32.00m,
+            Category = "Home"
+        },
+
+        new Product
+        {
+            Name = "Throw Blanket",
+            Price = 28.50m,
+            Category = "Home"
+        },
+
+        new Product
+        {
+            Name = "Soap Dispenser",
+            Price = 15.90m,
+            Category = "Home"
+        },
+
+        new Product
+        {
+            Name = "Scented Candle",
+            Price = 14.99m,
+            Category = "Decor"
+        },
+
+        new Product
+        {
+            Name = "Decorative Vase",
+            Price = 26.00m,
+            Category = "Decor"
+        },
+
+        new Product
+        {
+            Name = "Plant Pot",
+            Price = 16.50m,
+            Category = "Decor"
+        },
+
+        new Product
+        {
+            Name = "Storage Basket",
+            Price = 19.99m,
+            Category = "Organization"
+        },
+
+        new Product
+        {
+            Name = "Organizer Box",
+            Price = 11.50m,
+            Category = "Organization"
+        },
+
+        new Product
+        {
+            Name = "Laundry Basket",
+            Price = 22.00m,
+            Category = "Organization"
+        }
+    };
+
+    private List<CartItem> cart = new List<CartItem>();
+    private List<Product> GetFilteredProducts()
+    {
+        List<Product> result = products;
+        if (searchText != "")
+        {
+            result = result
+                .Where(product =>
+                    product.Name.ToLower()
+                        .Contains(searchText.ToLower()))
+                .ToList();
+        }
+
+        if (selectedCategory != "All")
+        {
+            result = result
+                .Where(product =>
+                    product.Category == selectedCategory)
+                .ToList();
+        }
+
+        if (sortOrder == "low")
+        {
+            result = result
+                .OrderBy(product => product.Price)
+                .ToList();
+        }
+
+        if (sortOrder == "high")
+        {
+            result = result
+                .OrderByDescending(product => product.Price)
+                .ToList();
+        }
+        return result;
+    }
+
+    private List<Product> GetProducts()
+    {
+        return GetFilteredProducts()
+            .Skip((currentPage - 1) * productsPerPage)
+            .Take(productsPerPage)
+            .ToList();
+    }
+
+    private int FilteredProductCount
+    {
+        get
+        {
+            return GetFilteredProducts().Count;
+        }
+    }
+
+    private int TotalPages
+    {
+        get
+        {
+            int productCount = GetFilteredProducts().Count;
+            return (int)Math.Ceiling(
+                (double)productCount / productsPerPage
+            );
+        }
+    }
+
+    private void SearchProducts()
+    {
+        searchText = searchInput;
+        currentPage = 1;
+    }
+
+    private void AddToCart(Product product)
+    {
+        var item = cart.FirstOrDefault(
+            item => item.Product == product
+        );
+
+        if (item != null)
+        {
+            item.Quantity++;
+        }
+        else
+        {
+            cart.Add(new CartItem
+            {
+                Product = product,
+                Quantity = 1
+            });
+        }
+    }
+
+    private void RemoveFromCart(CartItem item)
+    {
+        cart.Remove(item);
+    }
+
+    private void ToggleCart()
+    {
+        showCart = !showCart;
+    }
+
+    private void SelectCategory(string category)
+    {
+        selectedCategory = category;
+        currentPage = 1;
+    }
+
+    private string GetCategoryClass(string category)
+    {
+        if (selectedCategory == category)
+        {
+            return "category-button active";
+        }
+        return "category-button";
+    }
+
+    private void ClearFilters()
+    {
+        searchInput = "";
+        searchText = "";
+        selectedCategory = "All";
+        sortOrder = "";
+        currentPage = 1;
+    }
+
+    private void PreviousPage()
+    {
+        if (currentPage > 1)
+        {
+            currentPage--;
+        }
+    }
+
+    private void NextPage()
+    {
+        if (currentPage < TotalPages)
+        {
+            currentPage++;
+        }
+    }
+
+    private void GoToPage(int page)
+    {
+        currentPage = page;
+    }
+}

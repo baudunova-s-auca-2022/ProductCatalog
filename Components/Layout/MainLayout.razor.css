@@ -1,0 +1,53 @@
+.page {
+  min-height: 100vh;
+  background-color: #fdfbf9;
+}
+
+.header {
+  height: 72px;
+  display: flex;
+  align-items: center;
+  padding: 0 48px;
+  background-color: white;
+  border-bottom: 1px solid #eee7e2;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #34251f;
+  font-size: 21px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.logo-icon {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #b65336;
+  color: white;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.main-content {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 32px 32px 70px;
+}
+
+@media (max-width: 600px) {
+  .header {
+    height: 64px;
+    padding: 0 18px;
+  }
+
+  .main-content {
+    padding: 20px 14px 50px;
+  }
+}
