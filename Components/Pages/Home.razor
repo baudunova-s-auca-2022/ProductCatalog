@@ -1,5 +1,4 @@
 ﻿@page "/"
-
 @rendermode InteractiveServer
 
 <PageTitle>HomeMarket</PageTitle>
@@ -15,22 +14,42 @@
         </button>
     </div>
 
-    <div class="categories">
-        <button class="@GetCategoryClass("All")" @onclick='() => SelectCategory("All")'>
-            All
-        </button>
-        <button class="@GetCategoryClass("Kitchen")" @onclick='() => SelectCategory("Kitchen")'>
-            Kitchen
-        </button>
-        <button class="@GetCategoryClass("Home")" @onclick='() => SelectCategory("Home")'>
-            Home
-        </button>
-        <button class="@GetCategoryClass("Decor")" @onclick='() => SelectCategory("Decor")'>
-            Decor
-        </button>
-        <button class="@GetCategoryClass("Organization")" @onclick='() => SelectCategory("Organization")'>
-            Organization
-        </button>
+    <div class="categories-row">
+        <div class="categories">
+            <button class="@GetCategoryClass("All")" @onclick='() => SelectCategory("All")'>
+                All
+            </button>
+            <button class="@GetCategoryClass("Kitchen")" @onclick='() => SelectCategory("Kitchen")'>
+                Kitchen
+            </button>
+            <button class="@GetCategoryClass("Home")" @onclick='() => SelectCategory("Home")'>
+                Home
+            </button>
+            <button class="@GetCategoryClass("Decor")" @onclick='() => SelectCategory("Decor")'>
+                Decor
+            </button>
+            <button class="@GetCategoryClass("Organization")" @onclick='() => SelectCategory("Organization")'>
+                Organization
+            </button>
+        </div>
+
+        <div class="cart-wrapper">
+            <button class="cart-button" @onclick="ToggleCart">
+                <span>Cart</span>
+
+                @if (cart.Count > 0)
+                {
+                    <span class="cart-count">
+                        @cart.Sum(item => item.Quantity)
+                    </span>
+                }
+            </button>
+
+            @if (showCart)
+            {
+                <Cart Products="cart" OnClose="ToggleCart" OnRemove="RemoveFromCart" />
+            }
+        </div>
     </div>
 
     <div class="products-header">
@@ -39,37 +58,13 @@
             <p>@FilteredProductCount products</p>
         </div>
 
-        <div class="products-actions">
-            <div class="sort">
-                <span>Sort:</span>
-                <select @bind="sortOrder">
-                    <option value="">Default</option>
-                    <option value="low">
-                        Price: low to high
-                    </option>
-                    <option value="high">
-                        Price: high to low
-                    </option>
-                </select>
-            </div>
-
-            <div class="cart-wrapper">
-                <button class="cart-button" @onclick="ToggleCart">
-                    <span>Cart</span>
-
-                    @if (cart.Count > 0)
-                    {
-                        <span class="cart-count">
-                            @cart.Sum(item => item.Quantity)
-                        </span>
-                    }
-                </button>
-
-                @if (showCart)
-                {
-                    <Cart Products="cart" OnClose="ToggleCart" OnRemove="RemoveFromCart" />
-                }
-            </div>
+        <div class="sort">
+            <span>Sort:</span>
+            <select @bind="sortOrder">
+                <option value="">Default</option>
+                <option value="low">Price: low to high</option>
+                <option value="high">Price: high to low</option>
+            </select>
         </div>
     </div>
 
@@ -77,9 +72,7 @@
     {
         <div class="empty-products">
             <h3>No products found</h3>
-            <p>
-                Try another search or category.
-            </p>
+            <p>Try another search or category.</p>
             <button @onclick="ClearFilters">
                 Clear filters
             </button>
@@ -127,89 +120,18 @@
     private int productsPerPage = 8;
     private List<Product> products = new List<Product>()
     {
-        new Product
-        {
-            Name = "Ceramic Mug",
-            Price = 12.99m,
-            Category = "Kitchen"
-        },
-
-        new Product
-        {
-            Name = "Oil Dispenser",
-            Price = 18.50m,
-            Category = "Kitchen"
-        },
-
-        new Product
-        {
-            Name = "Cutting Board",
-            Price = 24.90m,
-            Category = "Kitchen"
-        },
-
-        new Product
-        {
-            Name = "Table Lamp",
-            Price = 32.00m,
-            Category = "Home"
-        },
-
-        new Product
-        {
-            Name = "Throw Blanket",
-            Price = 28.50m,
-            Category = "Home"
-        },
-
-        new Product
-        {
-            Name = "Soap Dispenser",
-            Price = 15.90m,
-            Category = "Home"
-        },
-
-        new Product
-        {
-            Name = "Scented Candle",
-            Price = 14.99m,
-            Category = "Decor"
-        },
-
-        new Product
-        {
-            Name = "Decorative Vase",
-            Price = 26.00m,
-            Category = "Decor"
-        },
-
-        new Product
-        {
-            Name = "Plant Pot",
-            Price = 16.50m,
-            Category = "Decor"
-        },
-
-        new Product
-        {
-            Name = "Storage Basket",
-            Price = 19.99m,
-            Category = "Organization"
-        },
-
-        new Product
-        {
-            Name = "Organizer Box",
-            Price = 11.50m,
-            Category = "Organization"
-        },
-
-        new Product
-        {
-            Name = "Laundry Basket",
-            Price = 22.00m,
-            Category = "Organization"
-        }
+        new Product { Name = "Ceramic Mug", Price = 12.99m, Category = "Kitchen" },
+        new Product { Name = "Oil Dispenser", Price = 18.50m, Category = "Kitchen" },
+        new Product { Name = "Cutting Board", Price = 24.90m, Category = "Kitchen" },
+        new Product { Name = "Table Lamp", Price = 32.00m, Category = "Home" },
+        new Product { Name = "Throw Blanket", Price = 28.50m, Category = "Home" },
+        new Product { Name = "Soap Dispenser", Price = 15.90m, Category = "Home" },
+        new Product { Name = "Scented Candle", Price = 14.99m, Category = "Decor" },
+        new Product { Name = "Decorative Vase", Price = 26.00m, Category = "Decor" },
+        new Product { Name = "Plant Pot", Price = 16.50m, Category = "Decor" },
+        new Product { Name = "Storage Basket", Price = 19.99m, Category = "Organization" },
+        new Product { Name = "Organizer Box", Price = 11.50m, Category = "Organization" },
+        new Product { Name = "Laundry Basket", Price = 22.00m, Category = "Organization" }
     };
 
     private List<CartItem> cart = new List<CartItem>();
@@ -220,16 +142,14 @@
         {
             result = result
                 .Where(product =>
-                    product.Name.ToLower()
-                        .Contains(searchText.ToLower()))
+                    product.Name.ToLower().Contains(searchText.ToLower()))
                 .ToList();
         }
 
         if (selectedCategory != "All")
         {
             result = result
-                .Where(product =>
-                    product.Category == selectedCategory)
+                .Where(product => product.Category == selectedCategory)
                 .ToList();
         }
 
